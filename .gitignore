@@ -1,0 +1,10 @@
+# Angular build output and CLI cache are generated, never committed.
+/dist/
+/.angular/cache/
+
+# Node
+/node_modules/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db

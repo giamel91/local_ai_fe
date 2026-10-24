@@ -1,7 +1,8 @@
-import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, ChangeDetectorRef, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -20,11 +21,15 @@ export class AppComponent {
   private http = inject(HttpClient);
   // Strumento per forzare l'aggiornamento dello schermo
   private cdr = inject(ChangeDetectorRef); 
+  private platformId = inject(PLATFORM_ID);
   
   
   // Questa funzione scatta DA SOLA appena l'utente apre o aggiorna la pagina
   ngOnInit() {
-      const urlHistory = 'http://localhost:8080/api/ai/history';
+      // Durante il prerender non esiste un browser: la chiamata HTTP va saltata.
+      if (!isPlatformBrowser(this.platformId)) return;
+
+      const urlHistory = `${environment.apiBaseUrl}/api/ai/history`;
       
       this.http.get<string[]>(urlHistory).subscribe({
         next: (storiaGrezza) => {
@@ -43,7 +48,7 @@ export class AppComponent {
     if (!this.domanda) return;
 
     this.staCaricando = true;
-    const url = `http://localhost:8080/api/ai/generate?message=${encodeURIComponent(this.domanda)}`;
+    const url = `${environment.apiBaseUrl}/api/ai/generate?message=${encodeURIComponent(this.domanda)}`;
 
     this.http.get(url).subscribe({
       next: (rispostaDalServer) => {
